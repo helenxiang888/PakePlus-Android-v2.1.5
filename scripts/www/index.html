@@ -1,11 +1,748 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机分组抽签系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .config-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .config-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .config-group {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .config-item {
+            margin-bottom: 15px;
+        }
+        
+        .config-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .config-item select, .config-item input[type="number"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #fff;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .selection-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .selection-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .select-all-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .select-all-btn:hover {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+            transform: translateY(-2px);
+        }
+        
+        .people-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+        }
+        
+        .person-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .person-item input {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .person-item label {
+            cursor: pointer;
+            font-size: 1rem;
+            color: #495057;
+        }
+        
+        .draw-btn {
+            display: block;
+            width: 220px;
+            margin: 0 auto 30px;
+            padding: 16px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .draw-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #fdbb2d, #b21f1f);
+        }
+        
+        .draw-btn:active {
+            transform: translateY(2px);
+        }
+        
+        .draw-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .group {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .group:hover {
+            transform: translateY(-8px);
+        }
+        
+        .group::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f, #fdbb2d);
+        }
+        
+        .group-header {
+            text-align: center;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+        
+        .leader {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 1.2rem;
+        }
+        
+        .leader span {
+            background-color: #ff8c00;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-right: 15px;
+            font-size: 1rem;
+        }
+        
+        .members {
+            list-style-type: none;
+        }
+        
+        .members li {
+            padding: 12px 15px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .members li:hover {
+            background-color: #e8f4fc;
+            transform: translateX(5px);
+        }
+        
+        .members li:before {
+            content: "•";
+            color: #6c5ce7;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .selection-info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .description {
+                font-size: 1rem;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .people-list {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                max-height: 150px;
+            }
+            
+            .draw-btn {
+                width: 100%;
+                max-width: 280px;
+                font-size: 1.1rem;
+                padding: 14px;
+            }
+            
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .group-header {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .config-panel, .selection-panel {
+                padding: 15px;
+            }
+            
+            .people-list {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .group {
+                padding: 15px;
+            }
+        }
+        
+        /* 动画效果 */
+        .shuffle-animation {
+            animation: shuffle 0.6s ease-in-out;
+        }
+        
+        @keyframes shuffle {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(8px); }
+            50% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .result-animation {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .group-1 { border-top: 8px solid #1a2a6c; }
+        .group-2 { border-top: 8px solid #b21f1f; }
+        .group-3 { border-top: 8px solid #fdbb2d; }
+        .group-4 { border-top: 8px solid #2ecc71; }
+        
+        .group-1 .group-header { color: #1a2a6c; }
+        .group-2 .group-header { color: #b21f1f; }
+        .group-3 .group-header { color: #fdbb2d; }
+        .group-4 .group-header { color: #2ecc71; }
+    </style>
+</head>
+<body>
+    <h1>随机分组抽签系统</h1>
+    <p class="description">从列表中选择人员，随机分成<span class="highlight">多个组</span>，并可选择是否选出<span class="highlight">组长</span></p>
+    
+    <div class="container">
+        <div class="config-panel">
+            <div class="config-header">
+                <div class="config-title">分组配置</div>
+            </div>
+            <div class="config-grid">
+                <div class="config-group">
+                    <div class="config-item">
+                        <label for="groupCount">分组数量</label>
+                        <select id="groupCount">
+                            <option value="2">2组</option>
+                            <option value="3">3组</option>
+                            <option value="4">4组</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label for="groupNameStyle">组名样式</label>
+                        <select id="groupNameStyle">
+                            <option value="letters">字母 (A组, B组)</option>
+                            <option value="numbers">数字 (第1组, 第2组)</option>
+                            <option value="colors">颜色 (红队, 蓝队)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="config-group">
+                    <div class="config-item">
+                        <label for="minGroupSize">每组最少人数</label>
+                        <input type="number" id="minGroupSize" min="1" value="2">
+                    </div>
+                    <div class="config-item">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="selectLeader" checked>
+                            <label for="selectLeader">随机选择组长</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="selection-panel">
+            <div class="selection-header">
+                <div class="selection-title">选择参与分组的人员</div>
+                <button class="select-all-btn" id="selectAllBtn">
+                    <i class="fas fa-check-square"></i> 全选
+                </button>
+            </div>
+            <div class="people-list" id="peopleList">
+                <!-- 人员列表将由JavaScript生成 -->
+            </div>
+            <div class="selection-info">
+                已选择 <span id="selectedCount">0</span> 人
+            </div>
+        </div>
+        
+        <button class="draw-btn" id="drawBtn" disabled>开始随机抽签</button>
+        
+        <div class="groups-container" id="groupsContainer">
+            <!-- 分组容器将由JavaScript动态生成 -->
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>© 2025 随机分组抽签系统 | 设计：xianghn</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const drawBtn = document.getElementById('drawBtn');
+            const peopleList = document.getElementById('peopleList');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const selectedCountEl = document.getElementById('selectedCount');
+            const groupsContainer = document.getElementById('groupsContainer');
+            const groupCountSelect = document.getElementById('groupCount');
+            const groupNameStyleSelect = document.getElementById('groupNameStyle');
+            const minGroupSizeInput = document.getElementById('minGroupSize');
+            const selectLeaderCheckbox = document.getElementById('selectLeader');
+            
+            // 初始人员列表
+            const people = [
+                '王浩', '吕泽芃', '杨悦', '许梦琳', '周家弘',
+                '刘嘉', '陈楚', '吕烨璇', '王薪洋', '滕芸'
+            ];
+            
+            // 组名选项
+            const groupNameOptions = {
+                letters: ['A组', 'B组', 'C组', 'D组'],
+                numbers: ['第1组', '第2组', '第3组', '第4组'],
+                colors: ['红队', '蓝队', '黄队', '绿队']
+            };
+            
+            // 初始化人员选择列表
+            function initPeopleList() {
+                peopleList.innerHTML = '';
+                people.forEach(person => {
+                    const div = document.createElement('div');
+                    div.className = 'person-item';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `person-${person}`;
+                    checkbox.value = person;
+                    checkbox.checked = true;
+                    checkbox.addEventListener('change', updateSelectionState);
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `person-${person}`;
+                    label.textContent = person;
+                    
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    peopleList.appendChild(div);
+                });
+                
+                updateSelectionState();
+            }
+            
+            // 更新选择状态
+            function updateSelectionState() {
+                const selectedPeople = getSelectedPeople();
+                const count = selectedPeople.length;
+                selectedCountEl.textContent = count;
+                
+                // 获取配置
+                const groupCount = parseInt(groupCountSelect.value);
+                const minGroupSize = parseInt(minGroupSizeInput.value);
+                
+                // 检查是否满足分组条件
+                const canGroup = count >= groupCount * minGroupSize;
+                drawBtn.disabled = !canGroup;
+                
+                // 更新全选按钮文本
+                selectAllBtn.innerHTML = count === people.length ? 
+                    '<i class="fas fa-times-circle"></i> 取消全选' : 
+                    '<i class="fas fa-check-square"></i> 全选';
+                
+                // 更新最小人数提示
+                if (!canGroup) {
+                    drawBtn.title = `至少需要 ${groupCount * minGroupSize} 人才能分成 ${groupCount} 组`;
+                } else {
+                    drawBtn.title = '';
+                }
+            }
+            
+            // 获取选中的人员
+            function getSelectedPeople() {
+                const checkboxes = peopleList.querySelectorAll('input[type="checkbox"]:checked');
+                return Array.from(checkboxes).map(checkbox => checkbox.value);
+            }
+            
+            // 全选/取消全选
+            selectAllBtn.addEventListener('click', function() {
+                const checkboxes = peopleList.querySelectorAll('input[type="checkbox"]');
+                const allSelected = getSelectedPeople().length === people.length;
+                
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = !allSelected;
+                });
+                
+                updateSelectionState();
+            });
+            
+            // 配置变化时更新状态
+            groupCountSelect.addEventListener('change', updateSelectionState);
+            minGroupSizeInput.addEventListener('change', updateSelectionState);
+            
+            // 初始化分组容器
+            function initGroupsContainer() {
+                groupsContainer.innerHTML = '';
+                const groupCount = parseInt(groupCountSelect.value);
+                
+                for (let i = 0; i < groupCount; i++) {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = `group group-${i+1}`;
+                    groupDiv.innerHTML = `
+                        <h2 class="group-header" id="group${i}Name">${groupNameOptions.letters[i]}</h2>
+                        <div class="leader" id="leader${i}">组长：<span id="leader${i}Name">待抽取</span></div>
+                        <ul class="members" id="group${i}">
+                            <li>待分组</li>
+                        </ul>
+                    `;
+                    groupsContainer.appendChild(groupDiv);
+                }
+            }
+            
+            drawBtn.addEventListener('click', function() {
+                // 添加动画效果
+                this.classList.add('shuffle-animation');
+                
+                // 执行分组
+                setTimeout(() => {
+                    performGrouping();
+                    
+                    // 移除动画类
+                    this.classList.remove('shuffle-animation');
+                }, 600);
+            });
+            
+            function performGrouping() {
+                // 获取选中的人员和配置
+                const selectedPeople = getSelectedPeople();
+                const groupCount = parseInt(groupCountSelect.value);
+                const groupNameStyle = groupNameStyleSelect.value;
+                const shouldSelectLeader = selectLeaderCheckbox.checked;
+                
+                // 初始化分组容器
+                initGroupsContainer();
+                
+                // 复制人员数组并随机打乱
+                const shuffledPeople = [...selectedPeople].sort(() => Math.random() - 0.5);
+                
+                // 计算每组大致人数
+                const groupSizes = Array(groupCount).fill(0);
+                for (let i = 0; i < shuffledPeople.length; i++) {
+                    groupSizes[i % groupCount]++;
+                }
+                
+                // 分配人员到各组
+                const groups = [];
+                let startIndex = 0;
+                
+                for (let i = 0; i < groupCount; i++) {
+                    const groupSize = groupSizes[i];
+                    const groupPeople = shuffledPeople.slice(startIndex, startIndex + groupSize);
+                    startIndex += groupSize;
+                    
+                    // 随机选择组长
+                    let leader = null;
+                    if (shouldSelectLeader && groupPeople.length > 0) {
+                        leader = groupPeople[Math.floor(Math.random() * groupPeople.length)];
+                    }
+                    
+                    groups.push({
+                        people: groupPeople,
+                        leader: leader
+                    });
+                }
+                
+                // 更新DOM显示
+                for (let i = 0; i < groupCount; i++) {
+                    const groupNameEl = document.getElementById(`group${i}Name`);
+                    const leaderNameEl = document.getElementById(`leader${i}Name`);
+                    const groupEl = document.getElementById(`group${i}`);
+                    
+                    // 设置组名
+                    groupNameEl.textContent = groupNameOptions[groupNameStyle][i];
+                    
+                    // 更新组长和成员显示
+                    updateGroupDisplay(groupEl, groups[i].people, groups[i].leader, leaderNameEl);
+                    
+                    // 添加结果动画
+                    groupEl.parentElement.classList.add('result-animation');
+                    setTimeout(() => {
+                        groupEl.parentElement.classList.remove('result-animation');
+                    }, 800);
+                }
+                
+                // 保存到历史记录
+                saveToHistory(groups);
+            }
+            
+            function updateGroupDisplay(groupElement, members, leader, leaderElement) {
+                // 清空现有内容
+                groupElement.innerHTML = '';
+                
+                if (members.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = '无成员';
+                    groupElement.appendChild(li);
+                    return;
+                }
+                
+                // 添加组成员
+                members.forEach(person => {
+                    const li = document.createElement('li');
+                    li.textContent = person;
+                    if (leader && person === leader) {
+                        li.style.fontWeight = 'bold';
+                        li.style.color = '#e17055';
+                        li.style.background = 'linear-gradient(135deg, #ffeaa7, #fab1a0)';
+                    }
+                    groupElement.appendChild(li);
+                });
+                
+                // 更新组长显示
+                if (leaderElement) {
+                    leaderElement.textContent = leader || '无';
+                    leaderElement.parentElement.style.display = leader ? 'flex' : 'none';
+                }
+            }
+            
+            function saveToHistory(groups) {
+                // 这里只是示例，实际应用中可以将历史记录保存到localStorage或其他存储
+                console.log('分组完成:', {
+                    groups: groups.map((group, index) => ({
+                        name: groupNameOptions.letters[index],
+                        people: group.people,
+                        leader: group.leader
+                    })),
+                    timestamp: new Date().toLocaleString()
+                });
+            }
+            
+            // 初始化页面
+            initPeopleList();
+            initGroupsContainer();
+            
+            // 添加响应式监听
+            window.addEventListener('resize', function() {
+                // 在窗口大小变化时重新初始化分组容器以确保正确布局
+                initGroupsContainer();
+            });
+        });
+    </script>
+</body>
 </html>
